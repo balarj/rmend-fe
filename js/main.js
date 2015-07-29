@@ -57,7 +57,7 @@ App.prototype = {
 		var settings = {
 		  "async": true,
 		  "crossDomain": true,
-		  "url": "http://rmend-be.appspot.com//v1/user/uuid/" + uuid,
+		  "url": Config.BASE_URL + "/user/uuid/" + uuid,
 		  "method": "GET",
 		  "headers": {}
 		}
@@ -93,7 +93,7 @@ App.prototype = {
 		var settings = {
 		  "async": true,
 		  "crossDomain": true,
-		  "url": "http://rmend-be.appspot.com//v1/document/topic/" + topic,
+		  "url": Config.BASE_URL + "/document/topic/" + topic,
 		  "method": "GET",
 		  "headers": {}
 		}
