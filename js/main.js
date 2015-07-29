@@ -56,13 +56,19 @@ App.prototype = {
                 }
             }
 
-            // Calls to get recommendations (content and item based)
+            // Generate recommendations
+            if (instance.uid) {
+                instance.getRecommendations(instance.uid, doc.docNum);
+            }
 
         });
 
+        // document refresh handler
         $("#refresh-documents").on("click", function(e) {
-        		instance.getDocumentsByTopic(instance.currentTopic);
+            instance.getDocumentsByTopic(instance.currentTopic);
         });
+
+        // TODO: Implement click handler for documents under recommendations
 
     },
 
@@ -152,6 +158,21 @@ App.prototype = {
         }
     },
 
+    updateRecommendedDocumentsView: function(documents) {
+        // clear out the container
+        $("#docs-recommended").empty();
+
+        if (documents) {
+            for (i in documents) {
+                doc = documents[i]
+                console.log(doc);
+                var docHTML = '<a href=#><span id="docNumMeta">' + doc.docNum + '</span><div class="doc" data-featherlight="#mylightbox">' + doc.title.substring(0, 15); + '</div></a>'
+                $("#docs-recommended").append(docHTML);
+
+            }
+        }
+    },
+
     sendUserImpression: function(uid, docNum, referrer) {
         var settings = {
             async: true,
@@ -173,9 +194,49 @@ App.prototype = {
         $.ajax(settings).done(function(response) {
             console.log("Response: ", response);
         }).fail(function(error) {
-            console.log("Error: ", JSON.stringify(error));
-            console.log("Error: user impression PUT");
+            console.log("Error in capturing user impression: ", JSON.stringify(error));
         });
+    },
+
+    getRecommendations: function(uid, docNum) {
+        var instance = this;
+
+
+        // stub for calling out both content-based and collaborative filtering methods.
+        instance.getContentBasedRecos(docNum);
+
+        // TODO: implement logic for calling CF recommendations also
+    },
+
+    getContentBasedRecos: function(docNum, resultType) {
+        var instance = this;
+        resultType = resultType || "TOP_10";
+
+        // stub for calling out content based recommender
+        var settings = {
+            async: true,
+            crossDomain: true,
+            url: "{0}/recommend/content/{1}".format(Config.BASE_URL, docNum),
+            method: "GET",
+            processData: true,
+            data: {
+                "resultType": resultType,
+            },
+        }
+
+        $.ajax(settings).done(function(response) {
+            console.log("Response: ", response);
+            instance.updateRecommendedDocumentsView(response);
+        }).fail(function(error) {
+            console.log("Error in retrieving content based recommendations: ", JSON.stringify(error));
+        });
+    },
+
+    getCollaborativeFilteringRecos: function(uid, docNum, resultType) {
+        var instance = this;
+        resultType = resultType || "RANDOM_10";
+
+        // stub for calling out CF based recommender
     },
 
     getURLParameter: function(name) {
