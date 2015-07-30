@@ -12,7 +12,7 @@ var App = function() {
     this.currentTopic = null;
     this.uuid = null; //c3b1abc4-0b87-4d76-be09-b7440de2f690
     this.uid = null;
-    this.recommendationHandler = new RecommendationHandler();
+    this.recommendationHandler = new RecommendationHandler(this);
     this.initUI();
 
     //refactor this into a fn()
@@ -25,10 +25,12 @@ var App = function() {
     }
 };
 
-var RecommendationHandler = function() {
+var RecommendationHandler = function(parent) {
+
     console.log("Initializing RecommendationHandler instance");
 
     this.recommendations = [];
+    this.parent = parent;
 };
 
 App.prototype = {
@@ -80,21 +82,21 @@ App.prototype = {
             var index = $(this).index();
             console.log("doc clicked | index: " + index);
 
-            var doc = instance.getDocumentAtIndexForReco(index);
-            if (doc) {
+            var rMetaInstance = instance.recommendationHandler.getDocumentAtIndex(index);
+            if (rMetaInstance) {
+                var doc = rMetaInstance.recDocument;
                 var lightBoxHTML = '<h2>' + doc.title + '</h2><div class="margin-top">' + doc.docBody.replace(/(?:\r\n|\r|\n|\n\n)/g, '<br />') + '</div>';
                 $("#mylightbox").html(lightBoxHTML);
 
-                // user impression
-                if (instance.uid) {
-                    console.log('docMeta: ' + $(this).children("#docMeta"));
-                    //instance.sendUserImpression(instance.uid, doc.docNum, "TOPICS");
+                // capture user impression
+                if (instance.uid && doc) {
+                    instance.sendUserImpression(instance.uid, doc.docNum, rMetaInstance.recType);
                 }
             }
 
             // Generate recommendations
             if (instance.uid) {
-                //instance.getRecommendations(instance.uid, doc.docNum);
+                instance.getRecommendations(instance.uid, doc.docNum);
             }
 
         });
@@ -168,7 +170,8 @@ App.prototype = {
     },
 
     getDocumentAtIndexForReco: function(index) {
-        if (this.recommendations) {
+        var recommendations = this.recommendationHandler.recommendations;
+        if (recommendations) {
             var doc = this.recommendations[index];
             return doc;
         }
@@ -205,7 +208,7 @@ App.prototype = {
         if (recommendations) {
             var i, doc;
             for (i in recommendations) {
-                recommendedDoc = recommendations[i];
+                var recommendedDoc = recommendations[i];
                 console.log(recommendedDoc);
                 doc = recommendedDoc.recDocument;
                 //console.log(doc);
@@ -243,48 +246,14 @@ App.prototype = {
 
     getRecommendations: function(uid, docNum) {
         var instance = this;
-        var recommendations = [];
 
         // stub for calling out both content-based and collaborative filtering methods.
-        recommendations.push(instance.getContentBasedRecos(docNum));
-        console.log(recommendations);
+        instance.recommendationHandler.getContentBasedRecos(docNum);
 
         // TODO: implement logic for calling CF recommendations also
         // var cfRecos = instance.getCollaborativeFilteringRecos(docNum);
 
         // TODO: Aggregate and display
-    },
-
-    getContentBasedRecos: function(docNum, resultType) {
-        var instance = this;
-        resultType = resultType || "TOP_10";
-
-        // stub for calling out content based recommender
-        var settings = {
-            async: true,
-            crossDomain: true,
-            url: "{0}/recommend/content/{1}".format(Config.BASE_URL, docNum),
-            method: "GET",
-            processData: true,
-            data: {
-                "resultType": resultType,
-            },
-        };
-
-        $.ajax(settings).done(function(data, textStatus, xhr) {
-            console.log('received ' + xhr.status);
-            var recType = xhr.getResponseHeader('X-Recommendation-Type');
-            var results = [];
-            if (xhr.status == 200 && data) {
-                data.forEach(function(element) {
-                    results.push(instance.buildRecommendationMeta(element, recType));
-                });
-            }
-            instance.updateRecommendedDocumentsView(results);
-            return results;
-        }).fail(function(data, textStatus, xhr) {
-            console.log("Error in retrieving content based recommendations: ", JSON.stringify(data));
-        });
     },
 
     getCollaborativeFilteringRecos: function(uid, docNum, resultType) {
@@ -315,9 +284,94 @@ App.prototype = {
 };
 
 RecommendationHandler.prototype = {
+
+    constructor: RecommendationHandler,
     print: function() {
         var instance = this;
         console.log(instance.recommendations);
+    },
+
+    update: function(recommendations) {
+        var instance = this;
+        for (rec in recommendations) {
+            instance.recommendations.push(recommendations[rec]);
+        }
+    },
+
+    refresh: function() {
+        var instance = this;
+        console.log(instance.parent);
+        instance.parent.updateRecommendedDocumentsView(instance.shuffle(instance.recommendations).slice(0, 10));
+    },
+
+    getDocumentAtIndex: function(index) {
+        if (this.recommendations) {
+            var doc = this.recommendations[index];
+            return doc;
+        }
+        return null;
+    },
+
+    getContentBasedRecos: function(docNum, resultType) {
+        var instance = this;
+        resultType = resultType || "TOP_10";
+
+        // stub for calling out content based recommender
+        var settings = {
+            async: true,
+            crossDomain: true,
+            url: "{0}/recommend/content/{1}".format(Config.BASE_URL, docNum),
+            method: "GET",
+            processData: true,
+            data: {
+                "resultType": resultType,
+            },
+        };
+
+        $.ajax(settings).done(function(data, textStatus, xhr) {
+            console.log('received ' + xhr.status);
+            var recType = xhr.getResponseHeader('X-Recommendation-Type');
+            var results = [];
+            if (xhr.status == 200 && data) {
+                data.forEach(function(element) {
+                    results.push(instance.buildRMeta(element, recType));
+                });
+            }
+            instance.update(results);
+            instance.refresh();
+        }).fail(function(data, textStatus, xhr) {
+            console.log("Error in retrieving content based recommendations: ", JSON.stringify(data));
+        });
+    },
+
+    buildRMeta: function(recDoc, recType) {
+        var retVal = {
+            'recDocument': recDoc,
+            'recType': recType,
+        };
+        return retVal;
+    },
+
+    /**
+     * Source: http://bost.ocks.org/mike/shuffle/
+     */
+    shuffle: function(array) {
+        var m = array.length,
+            t, i;
+
+        // While there remain elements to shuffle…
+        while (m) {
+
+            // Pick a remaining element…
+            i = Math.floor(Math.random() * m--);
+
+            // And swap it with the current element.
+            t = array[m];
+            array[m] = array[i];
+            array[i] = t;
+        }
+
+        return array;
     }
 };
 /**
