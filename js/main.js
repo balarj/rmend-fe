@@ -12,6 +12,7 @@ var App = function() {
     this.currentTopic = null;
     this.uuid = null; //c3b1abc4-0b87-4d76-be09-b7440de2f690
     this.uid = null;
+    this.recommendationHandler = new RecommendationHandler();
     this.initUI();
 
     //refactor this into a fn()
@@ -22,6 +23,12 @@ var App = function() {
     } else {
         this.greet();
     }
+}
+
+var RecommendationHandler = function() {
+    console.log("Initializing RecommendationHandler instance");
+
+    this.recommendations = [];
 }
 
 App.prototype = {
@@ -265,7 +272,7 @@ App.prototype = {
         }
 
         $.ajax(settings).done(function (data, textStatus, xhr) {
-            console.log('Response code: ' + xhr.status);
+            console.log('received ' + xhr.status);
             var recType = xhr.getResponseHeader('X-Recommendation-Type');
             var results = [];
             if (xhr.status == 200 && data) {
@@ -307,6 +314,12 @@ App.prototype = {
     }
 };
 
+RecommendationHandler.prototype = {
+    print: function() {
+        var instance = this;
+        console.log(instance.recommendations);
+    }
+}
 /**
  *  Credits : http://stackoverflow.com/questions/25227119/javascript-strings-format-is-not-defined
  */
