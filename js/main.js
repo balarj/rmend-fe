@@ -23,13 +23,13 @@ var App = function() {
     } else {
         this.greet();
     }
-}
+};
 
 var RecommendationHandler = function() {
     console.log("Initializing RecommendationHandler instance");
 
     this.recommendations = [];
-}
+};
 
 App.prototype = {
     constructor: App,
@@ -108,7 +108,7 @@ App.prototype = {
             "url": "{0}/user/uuid/{1}".format(Config.BASE_URL, uuid),
             "method": "GET",
             "headers": {}
-        }
+        };
 
         $.ajax(settings).done(function(response) {
             console.log(response);
@@ -146,13 +146,13 @@ App.prototype = {
             "url": Config.BASE_URL + "/document/topic/" + topic,
             "method": "GET",
             "headers": {}
-        }
+        };
 
         $.ajax(settings).done(function(response) {
             console.log(response);
             instance.currentTopic = topic;
             instance.topics[topic] = response;
-            instance.updateTopicDocumentsView(response);
+            instance.updateTopicDocumentsView();
         }).fail(function(error) {
             console.log("Error: topic get");
         });
@@ -175,7 +175,7 @@ App.prototype = {
         return null;
     },
 
-    updateTopicDocumentsView: function(documents, recType) {
+    updateTopicDocumentsView: function(recType) {
         $("#docs-by-topic").empty();
 
         recType = recType || "TOPIC";
@@ -187,10 +187,10 @@ App.prototype = {
             var i, doc;
             var documents = topics[currentTopic];
             for (i in documents) {
-                doc = documents[i]
+                doc = documents[i];
                 //console.log(doc);
                 var docHTML = '<a href=#><span id="docMeta">' + recType + ':' + doc.docNum + '</span>' +
-                '<div class="doc" data-featherlight="#mylightbox">' + doc.title.substring(0, 15); + '</div></a>'
+                    '<div class="doc" data-featherlight="#mylightbox">' + doc.title.substring(0, 15) + '</div></a>';
                 $("#docs-by-topic").append(docHTML);
 
             }
@@ -210,7 +210,7 @@ App.prototype = {
                 doc = recommendedDoc.recDocument;
                 //console.log(doc);
                 var docHTML = '<a href=#><span id="docMeta">' + recommendedDoc.recType + ':' + doc.docNum + '</span>' +
-                '<div class="doc" data-featherlight="#mylightbox">' + doc.title.substring(0, 15); + '</div></a>'
+                    '<div class="doc" data-featherlight="#mylightbox">' + doc.title.substring(0, 15) + '</div></a>';
                 $("#docs-recommended").append(docHTML);
             }
         }
@@ -230,11 +230,11 @@ App.prototype = {
                 "uid": uid,
                 "docNum": docNum
             }),
-        }
+        };
 
         console.log(settings);
 
-        $.ajax(settings).done(function (data, textStatus, xhr) {
+        $.ajax(settings).done(function(data, textStatus, xhr) {
             console.log(textStatus);
         }).fail(function(error) {
             console.log("Error in capturing user impression: ", JSON.stringify(error));
@@ -269,20 +269,20 @@ App.prototype = {
             data: {
                 "resultType": resultType,
             },
-        }
+        };
 
-        $.ajax(settings).done(function (data, textStatus, xhr) {
+        $.ajax(settings).done(function(data, textStatus, xhr) {
             console.log('received ' + xhr.status);
             var recType = xhr.getResponseHeader('X-Recommendation-Type');
             var results = [];
             if (xhr.status == 200 && data) {
-                data.forEach(function (element) {
+                data.forEach(function(element) {
                     results.push(instance.buildRecommendationMeta(element, recType));
                 });
             }
             instance.updateRecommendedDocumentsView(results);
             return results;
-        }).fail(function (data, textStatus, xhr) {
+        }).fail(function(data, textStatus, xhr) {
             console.log("Error in retrieving content based recommendations: ", JSON.stringify(data));
         });
     },
@@ -295,7 +295,7 @@ App.prototype = {
     },
 
     getURLParameter: function(name) {
-        return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [, ""])[1].replace(/\+/g, '%20')) || null
+        return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [, ""])[1].replace(/\+/g, '%20')) || null;
     },
 
     buildRecommendationMeta: function(recDoc, recType) {
@@ -310,7 +310,7 @@ App.prototype = {
      * Credits: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach
      */
     logArrayElements: function(element, index, array) {
-      console.log('a[' + index + '] = ' + JSON.stringify(element));
+        console.log('a[' + index + '] = ' + JSON.stringify(element));
     }
 };
 
@@ -319,7 +319,7 @@ RecommendationHandler.prototype = {
         var instance = this;
         console.log(instance.recommendations);
     }
-}
+};
 /**
  *  Credits : http://stackoverflow.com/questions/25227119/javascript-strings-format-is-not-defined
  */
