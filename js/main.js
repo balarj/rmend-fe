@@ -1,7 +1,7 @@
 /*
 
 TODOs:
-	1. If there is not UUID provided.. show no content at all,  or show static content (like a preview)
+    1. If there is not UUID provided.. show no content at all,  or show static content (like a preview)
 */
 
 var App = function() {
@@ -45,7 +45,7 @@ App.prototype = {
             var index = $(this).index();
             console.log("doc clicked | index: " + index);
 
-            var doc = instance.getDocumentAtIndex(index);
+            var doc = instance.getDocumentAtIndexForTopic(index);
             if (doc) {
                 var lightBoxHTML = '<h2>' + doc.title + '</h2><div class="margin-top">' + doc.docBody.replace(/(?:\r\n|\r|\n|\n\n)/g, '<br />') + '</div>';
                 $("#mylightbox").html(lightBoxHTML);
@@ -68,8 +68,29 @@ App.prototype = {
             instance.getDocumentsByTopic(instance.currentTopic);
         });
 
-        // TODO: Implement click handler for documents under recommendations
+        // click handler for documents under recommendations
+        $("#docs-recommended").on("click", 'a', function(e) {
+            var index = $(this).index();
+            console.log("doc clicked | index: " + index);
 
+            var doc = instance.getDocumentAtIndexForReco(index);
+            if (doc) {
+                var lightBoxHTML = '<h2>' + doc.title + '</h2><div class="margin-top">' + doc.docBody.replace(/(?:\r\n|\r|\n|\n\n)/g, '<br />') + '</div>';
+                $("#mylightbox").html(lightBoxHTML);
+
+                // user impression
+                if (instance.uid) {
+                    console.log('docMeta: ' + $(this).children("#docMeta"));
+                    //instance.sendUserImpression(instance.uid, doc.docNum, "TOPICS");
+                }
+            }
+
+            // Generate recommendations
+            if (instance.uid) {
+                //instance.getRecommendations(instance.uid, doc.docNum);
+            }
+
+        });
     },
 
     getUserDetails: function(uuid) {
@@ -130,7 +151,7 @@ App.prototype = {
         });
     },
 
-    getDocumentAtIndex: function(index) {
+    getDocumentAtIndexForTopic: function(index) {
         if (this.currentTopic && this.topics) {
             var documents = this.topics[this.currentTopic];
             var doc = documents[index];
@@ -139,8 +160,18 @@ App.prototype = {
         return null;
     },
 
-    updateTopicDocumentsView: function() {
+    getDocumentAtIndexForReco: function(index) {
+        if (this.recommendations) {
+            var doc = this.recommendations[index];
+            return doc;
+        }
+        return null;
+    },
+
+    updateTopicDocumentsView: function(documents, recType) {
         $("#docs-by-topic").empty();
+
+        recType = recType || "TOPIC";
 
         var currentTopic = this.currentTopic;
         var topics = this.topics;
@@ -150,25 +181,30 @@ App.prototype = {
             var documents = topics[currentTopic];
             for (i in documents) {
                 doc = documents[i]
-                console.log(doc);
-                var docHTML = '<a href=#><span id="docMeta">' + doc.docNum + '</span><div class="doc" data-featherlight="#mylightbox">' + doc.title.substring(0, 15); + '</div></a>'
+                //console.log(doc);
+                var docHTML = '<a href=#><span id="docMeta">' + recType + ':' + doc.docNum + '</span>' +
+                '<div class="doc" data-featherlight="#mylightbox">' + doc.title.substring(0, 15); + '</div></a>'
                 $("#docs-by-topic").append(docHTML);
 
             }
         }
     },
 
-    updateRecommendedDocumentsView: function(documents) {
+    updateRecommendedDocumentsView: function(recommendations) {
         // clear out the container
         $("#docs-recommended").empty();
+        console.log(recommendations);
 
-        if (documents) {
-            for (i in documents) {
-                doc = documents[i]
-                console.log(doc);
-                var docHTML = '<a href=#><span id="docMeta">' + doc.docNum + '</span><div class="doc" data-featherlight="#mylightbox">' + doc.title.substring(0, 15); + '</div></a>'
+        if (recommendations) {
+            var i, doc;
+            for (i in recommendations) {
+                recommendedDoc = recommendations[i];
+                console.log(recommendedDoc);
+                doc = recommendedDoc.recDocument;
+                //console.log(doc);
+                var docHTML = '<a href=#><span id="docMeta">' + recommendedDoc.recType + ':' + doc.docNum + '</span>' +
+                '<div class="doc" data-featherlight="#mylightbox">' + doc.title.substring(0, 15); + '</div></a>'
                 $("#docs-recommended").append(docHTML);
-
             }
         }
     },
@@ -191,8 +227,8 @@ App.prototype = {
 
         console.log(settings);
 
-        $.ajax(settings).done(function(response) {
-            console.log("Response: ", response);
+        $.ajax(settings).done(function (data, textStatus, xhr) {
+            console.log(textStatus);
         }).fail(function(error) {
             console.log("Error in capturing user impression: ", JSON.stringify(error));
         });
@@ -200,12 +236,16 @@ App.prototype = {
 
     getRecommendations: function(uid, docNum) {
         var instance = this;
-
+        var recommendations = [];
 
         // stub for calling out both content-based and collaborative filtering methods.
-        instance.getContentBasedRecos(docNum);
+        recommendations.push(instance.getContentBasedRecos(docNum));
+        console.log(recommendations);
 
         // TODO: implement logic for calling CF recommendations also
+        // var cfRecos = instance.getCollaborativeFilteringRecos(docNum);
+
+        // TODO: Aggregate and display
     },
 
     getContentBasedRecos: function(docNum, resultType) {
@@ -224,11 +264,19 @@ App.prototype = {
             },
         }
 
-        $.ajax(settings).done(function(response) {
-            console.log("Response: ", response);
-            instance.updateRecommendedDocumentsView(response);
-        }).fail(function(error) {
-            console.log("Error in retrieving content based recommendations: ", JSON.stringify(error));
+        $.ajax(settings).done(function (data, textStatus, xhr) {
+            console.log('Response code: ' + xhr.status);
+            var recType = xhr.getResponseHeader('X-Recommendation-Type');
+            var results = [];
+            if (xhr.status == 200 && data) {
+                data.forEach(function (element) {
+                    results.push(instance.buildRecommendationMeta(element, recType));
+                });
+            }
+            instance.updateRecommendedDocumentsView(results);
+            return results;
+        }).fail(function (data, textStatus, xhr) {
+            console.log("Error in retrieving content based recommendations: ", JSON.stringify(data));
         });
     },
 
@@ -241,11 +289,26 @@ App.prototype = {
 
     getURLParameter: function(name) {
         return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [, ""])[1].replace(/\+/g, '%20')) || null
+    },
+
+    buildRecommendationMeta: function(recDoc, recType) {
+        var retVal = {
+            'recDocument': recDoc,
+            'recType': recType,
+        };
+        return retVal;
+    },
+
+    /**
+     * Credits: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach
+     */
+    logArrayElements: function(element, index, array) {
+      console.log('a[' + index + '] = ' + JSON.stringify(element));
     }
-}
+};
 
 /**
- *	Credits : http://stackoverflow.com/questions/25227119/javascript-strings-format-is-not-defined
+ *  Credits : http://stackoverflow.com/questions/25227119/javascript-strings-format-is-not-defined
  */
 String.prototype.format = function() {
     var args = [].slice.call(arguments);
