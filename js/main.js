@@ -151,7 +151,7 @@ App.prototype = {
             for (i in documents) {
                 doc = documents[i]
                 console.log(doc);
-                var docHTML = '<a href=#><span id="docNumMeta">' + doc.docNum + '</span><div class="doc" data-featherlight="#mylightbox">' + doc.title.substring(0, 15); + '</div></a>'
+                var docHTML = '<a href=#><span id="docMeta">' + doc.docNum + '</span><div class="doc" data-featherlight="#mylightbox">' + doc.title.substring(0, 15); + '</div></a>'
                 $("#docs-by-topic").append(docHTML);
 
             }
@@ -166,7 +166,7 @@ App.prototype = {
             for (i in documents) {
                 doc = documents[i]
                 console.log(doc);
-                var docHTML = '<a href=#><span id="docNumMeta">' + doc.docNum + '</span><div class="doc" data-featherlight="#mylightbox">' + doc.title.substring(0, 15); + '</div></a>'
+                var docHTML = '<a href=#><span id="docMeta">' + doc.docNum + '</span><div class="doc" data-featherlight="#mylightbox">' + doc.title.substring(0, 15); + '</div></a>'
                 $("#docs-recommended").append(docHTML);
 
             }
