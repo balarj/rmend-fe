@@ -66,6 +66,12 @@ p {
 	display: none;
 }
 
+.toast-warning {
+	font-size: 8pt;
+    top: 10px;
+    margin-left: -150px;
+}
+
 .doc {
 	display: inline-block;
 	width: 150px;
