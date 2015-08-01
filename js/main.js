@@ -72,7 +72,13 @@ App.prototype = {
 
             var doc = instance.getDocumentAtIndexForTopic(index);
             if (doc) {
-                var lightBoxHTML = '<h2>' + doc.title + '</h2><div class="margin-top">' + doc.docBody.replace(/(?:\r\n|\r|\n|\n\n)/g, '<br />') + '</div>';
+
+            	var lightBoxHTML = '<h2>' + doc.title + '</h2><div class="margin-top">' + doc.docBody.replace(/(?:\r\n|\r|\n|\n\n)/g, '<br />') + '</div>';
+                
+                if(doc.contentBeans.length > 0) {
+                	lightBoxHTML += instance.getContentTagsHTML(doc.contentBeans);	
+                }
+                
                 $("#mylightbox").html(lightBoxHTML);
 
                 // user impression
@@ -104,6 +110,11 @@ App.prototype = {
             if (rMetaInstance) {
                 var doc = rMetaInstance.recDocument;
                 var lightBoxHTML = '<h2>' + doc.title + '</h2><div class="margin-top">' + doc.docBody.replace(/(?:\r\n|\r|\n|\n\n)/g, '<br />') + '</div>';
+               	
+               	if(doc.contentBeans.length > 0) {
+                	lightBoxHTML += instance.getContentTagsHTML(doc.contentBeans);	
+                }
+                
                 $("#mylightbox").html(lightBoxHTML);
 
                 // capture user impression
@@ -235,6 +246,21 @@ App.prototype = {
                 $("#docs-recommended").append(docHTML);
             }
         }
+    },
+
+    getContentTagsHTML:function(contentBeans) {
+    	var contentBeansHTML = "<div class='content-beans-container'>";            
+   		// TODO: map may be removed if string splitting is not necessary
+    	var contentBeans = contentBeans.map(function(string){
+    		var keyValueArray = string.split(":");
+    		var value = keyValueArray[1];
+    		contentBeansHTML += "<p class='box'>"+value+"</p>";
+    		return value;
+    	});
+
+    	contentBeansHTML += "</div>";
+    	return contentBeansHTML;
+
     },
 
     sendUserImpression: function(uid, docNum, referrer) {
