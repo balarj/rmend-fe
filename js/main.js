@@ -32,6 +32,11 @@ var RecommendationHandler = function(parent) {
     this.recommendations = [];
     this.errorMsg = null;
     this.parent = parent;
+    this.recState = {};
+    this.myTimerId;
+
+    this.currentWaitMs = 0;
+    this.maxWaitTimeMs = 100*50; // Max wait
 };
 
 App.prototype = {
@@ -83,7 +88,7 @@ App.prototype = {
 
                 // user impression
                 if (instance.uid) {
-                    instance.sendUserImpression(instance.uid, doc.docNum, "TOPICS");
+                    instance.sendUserImpression(instance.uid, doc.docNum, "topics");
                 }
             }
             // Generate recommendations
@@ -210,7 +215,7 @@ App.prototype = {
     updateTopicDocumentsView: function(recType) {
         $("#docs-by-topic").empty();
 
-        recType = recType || "TOPIC";
+        recType = recType || "topic";
 
         var currentTopic = this.currentTopic;
         var topics = this.topics;
@@ -221,8 +226,8 @@ App.prototype = {
             for (i in documents) {
                 doc = documents[i];
                 //console.log(doc);
-                var docHTML = '<a href=#><span id="docMeta">' + recType + ':' + doc.docNum + '</span>' +
-                    '<div class="doc" data-featherlight="#mylightbox">' + doc.title.substring(0, 15) + '</div></a>';
+                var docHTML = '<a href=#><div class="'+ recType +'"><span class="docMeta">' + recType + ':' + doc.docNum + '</span>' +
+                    '<div class="doc" data-featherlight="#mylightbox">' + doc.title.substring(0, 15) + '</div></div></a>';
                 $("#docs-by-topic").append(docHTML);
 
             }
@@ -240,9 +245,10 @@ App.prototype = {
                 var recommendedDoc = recommendations[i];
                 //console.log(recommendedDoc);
                 doc = recommendedDoc.recDocument;
+                var recType = recommendedDoc.recType.toDash() || "unknown";
                 //console.log(doc);
-                var docHTML = '<a href=#><span id="docMeta">' + recommendedDoc.recType + ':' + doc.docNum + '</span>' +
-                    '<div class="doc" data-featherlight="#mylightbox">' + doc.title.substring(0, 15) + '</div></a>';
+                var docHTML = '<a href=#><div class="'+ recType +'"><span class="docMeta">' + recommendedDoc.recType + ':' + doc.docNum + '</span>' +
+                    '<div class="doc" data-featherlight="#mylightbox">' + doc.title.substring(0, 15) + '</div></div></a>';
                 $("#docs-recommended").append(docHTML);
             }
         }
@@ -319,9 +325,8 @@ RecommendationHandler.prototype = {
     },
 
     update: function(recommendations) {
-        var instance = this;
         for (rec in recommendations) {
-            instance.recommendations.push(recommendations[rec]);
+            this.recommendations.push(recommendations[rec]);
         }
     },
 
@@ -333,9 +338,50 @@ RecommendationHandler.prototype = {
         this.errorMsg = null;
     },
 
-    refresh: function() {
+    markRecState: function(key, value) {
+        value = value || false;
+        this.recState[key] = value;
+    },
+
+    resetRecState: function() {
+        this.recState = {};
+        clearTimeout(this.myTimerId);
+        this.currentWaitMs = 0;
+        this.myTimerId = null;
+    },
+
+    checkRecState: function() {
         var instance = this;
-        instance.parent.updateRecommendedDocumentsView(instance.shuffle(instance.recommendations).slice(0, 10));
+        for (var key in instance.recState) {
+            if (!instance.recState[key]) {
+                return false;
+            }
+        }
+        return true;
+    },
+
+    waitForResults: function() {
+        var instance = this;
+        var interval = 100;
+        if (!instance.myTimerId) {
+            instance.myTimerId = setInterval(function() {
+                console.log('checking...');
+                if (instance.checkRecState()) {
+                    instance.refresh();
+                }
+                else {
+                    instance.currentWaitMs+=interval;
+                    if (instance.currentWaitMs >= instance.maxWaitTimeMs) {
+                        instance.refresh();
+                    }
+                }
+            }, interval); // Set a timer with 1s interval.
+        }
+    },
+
+    refresh: function() {
+        this.parent.updateRecommendedDocumentsView(this.shuffle(this.recommendations).slice(0, 10));
+        this.resetRecState();
     },
 
     getDocumentAtIndex: function(index) {
@@ -346,7 +392,7 @@ RecommendationHandler.prototype = {
         return null;
     },
 
-    manangeFailure: function(xhr) {
+    manangeFailure: function(xhr, type) {
         var instance = this;
         var errorMsg = 'Error (' + xhr.status + "): " + xhr.getResponseHeader('X-Error-Msg');
         switch (xhr.status) {
@@ -356,9 +402,10 @@ RecommendationHandler.prototype = {
                 instance.errorMsg = errorMsg;
                 break;
         }
+        instance.markRecState(type, true);
     },
 
-    manageSuccess: function(data, xhr) {
+    manageSuccess: function(data, xhr, type) {
         var instance = this;
         var recType = xhr.getResponseHeader('X-Recommendation-Type');
         var results = [];
@@ -368,12 +415,15 @@ RecommendationHandler.prototype = {
             });
         }
         instance.update(results);
-        instance.refresh();
+        instance.markRecState(type, true);
     },
 
     getContentBasedRecos: function(docNum, resultType) {
         var instance = this;
         resultType = resultType || "TOP_10";
+
+        var type = 'content';
+        instance.markRecState(type);
 
         // stub for calling out content based recommender
         var settings = {
@@ -389,15 +439,19 @@ RecommendationHandler.prototype = {
 
         $.ajax(settings).done(function(data, textStatus, xhr) {
             console.log('(GET content reco) status: ' + xhr.status);
-            instance.manageSuccess(data, xhr);
+            instance.manageSuccess(data, xhr, type);
         }).fail(function(xhr, textStatus, errorThrown) {
-            instance.manangeFailure(xhr);
+            instance.manangeFailure(xhr, type);
         });
+        instance.waitForResults();
     },
 
     getCFRecos: function(docNum, resultType) {
         var instance = this;
         resultType = resultType || "RANDOM_10";
+
+        var type = 'cf';
+        instance.markRecState(type);
 
         // stub for calling out content based recommender
         var settings = {
@@ -414,10 +468,11 @@ RecommendationHandler.prototype = {
         $.ajax(settings)
         .done(function(data, textStatus, xhr) {
             console.log('(GET cf reco) status: ' + xhr.status);
-            instance.manageSuccess(data, xhr);
+            instance.manageSuccess(data, xhr, type);
         }).fail(function(xhr, textStatus, errorThrown) {
-            instance.manangeFailure(xhr);
+            instance.manangeFailure(xhr, type);
         });
+        instance.waitForResults();
     },
 
     buildRMeta: function(recDoc, recType) {
@@ -458,6 +513,13 @@ String.prototype.format = function() {
     return this.replace(/(\{\d+\})/g, function(a) {
         return args[+(a.substr(1, a.length - 2)) || 0];
     });
+};
+
+/**
+ *  Credits : http://jamesroberts.name/blog/2010/02/22/string-functions-for-javascript-trim-to-camel-case-to-dashed-and-to-underscore/
+ */
+String.prototype.toDash = function(){
+    return this.replace(/([A-Z])/g, function($1){return "-"+$1.toLowerCase();}).substr(1);
 };
 
 // ------------------------------------------
