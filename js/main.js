@@ -2,6 +2,7 @@
 
 TODOs:
     1. If there is not UUID provided.. show no content at all,  or show static content (like a preview)
+    2. Disable clicking "Some Document placeholder"
 */
 
 var App = function() {
@@ -30,6 +31,7 @@ var RecommendationHandler = function(parent) {
     console.log("Initializing RecommendationHandler instance");
 
     this.recommendations = [];
+    this.errorMsg = null;
     this.parent = parent;
 };
 
@@ -38,12 +40,25 @@ App.prototype = {
     initUI: function() {
         var instance = this;
 
+        // lightbox default behavior
+        $.featherlight.defaults.afterClose = function() {
+            var errorMsg = instance.recommendationHandler.getErrors();
+            if (errorMsg) {
+                toastr.warning(errorMsg, {
+                    "timeOut": "2000",
+                    "progressBar": true,
+                });
+            }
+            instance.recommendationHandler.resetErrors();
+        };
+
         // topic click handler
         $(".topic").on("click", function(e) {
             e.preventDefault();
             var topic = $(this).attr('topic');
             if (topic) {
-                console.log(topic + "clicked");
+                $("#docs-recommended").empty();
+                console.log(topic + " - clicked");
                 instance.currentTopic = topic;
                 instance.getDocumentsByTopic(topic);
             }
@@ -52,7 +67,7 @@ App.prototype = {
         // document (under topic) click handler
         $("#docs-by-topic").on("click", 'a', function(e) {
             var index = $(this).index();
-            console.log("doc clicked | index: " + index);
+            //console.log("doc clicked | index: " + index);
 
             var doc = instance.getDocumentAtIndexForTopic(index);
             if (doc) {
@@ -80,7 +95,7 @@ App.prototype = {
         // click handler for documents under recommendations
         $("#docs-recommended").on("click", 'a', function(e) {
             var index = $(this).index();
-            console.log("doc clicked | index: " + index);
+            //console.log("doc clicked | index: " + index);
 
             var rMetaInstance = instance.recommendationHandler.getDocumentAtIndex(index);
             if (rMetaInstance) {
@@ -151,7 +166,7 @@ App.prototype = {
         };
 
         $.ajax(settings).done(function(response) {
-            console.log(response);
+            //console.log(response.length);
             instance.currentTopic = topic;
             instance.topics[topic] = response;
             instance.updateTopicDocumentsView();
@@ -203,13 +218,13 @@ App.prototype = {
     updateRecommendedDocumentsView: function(recommendations) {
         // clear out the container
         $("#docs-recommended").empty();
-        console.log(recommendations);
+        //console.log(recommendations);
 
         if (recommendations) {
             var i, doc;
             for (i in recommendations) {
                 var recommendedDoc = recommendations[i];
-                console.log(recommendedDoc);
+                //console.log(recommendedDoc);
                 doc = recommendedDoc.recDocument;
                 //console.log(doc);
                 var docHTML = '<a href=#><span id="docMeta">' + recommendedDoc.recType + ':' + doc.docNum + '</span>' +
@@ -235,10 +250,10 @@ App.prototype = {
             }),
         };
 
-        console.log(settings);
+        //console.log(settings);
 
         $.ajax(settings).done(function(data, textStatus, xhr) {
-            console.log(textStatus);
+            console.log('(PUT impression) status: ' + xhr.status);
         }).fail(function(error) {
             console.log("Error in capturing user impression: ", JSON.stringify(error));
         });
@@ -251,28 +266,11 @@ App.prototype = {
         instance.recommendationHandler.getContentBasedRecos(docNum);
 
         // TODO: implement logic for calling CF recommendations also
-        // var cfRecos = instance.getCollaborativeFilteringRecos(docNum);
-
-        // TODO: Aggregate and display
-    },
-
-    getCollaborativeFilteringRecos: function(uid, docNum, resultType) {
-        var instance = this;
-        resultType = resultType || "RANDOM_10";
-
-        // stub for calling out CF based recommender
+        instance.recommendationHandler.getCFRecos(docNum);
     },
 
     getURLParameter: function(name) {
         return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [, ""])[1].replace(/\+/g, '%20')) || null;
-    },
-
-    buildRecommendationMeta: function(recDoc, recType) {
-        var retVal = {
-            'recDocument': recDoc,
-            'recType': recType,
-        };
-        return retVal;
     },
 
     /**
@@ -298,9 +296,16 @@ RecommendationHandler.prototype = {
         }
     },
 
+    getErrors: function() {
+        return this.errorMsg;
+    },
+
+    resetErrors: function() {
+        this.errorMsg = null;
+    },
+
     refresh: function() {
         var instance = this;
-        console.log(instance.parent);
         instance.parent.updateRecommendedDocumentsView(instance.shuffle(instance.recommendations).slice(0, 10));
     },
 
@@ -310,6 +315,31 @@ RecommendationHandler.prototype = {
             return doc;
         }
         return null;
+    },
+
+    manangeFailure: function(xhr) {
+        var instance = this;
+        var errorMsg = 'Error (' + xhr.status + "): " + xhr.getResponseHeader('X-Error-Msg');
+        switch (xhr.status) {
+            case 500:
+            case 404:
+                console.log(errorMsg);
+                instance.errorMsg = errorMsg;
+                break;
+        }
+    },
+
+    manageSuccess: function(data, xhr) {
+        var instance = this;
+        var recType = xhr.getResponseHeader('X-Recommendation-Type');
+        var results = [];
+        if (xhr.status == 200 && data) {
+            data.forEach(function(element) {
+                results.push(instance.buildRMeta(element, recType));
+            });
+        }
+        instance.update(results);
+        instance.refresh();
     },
 
     getContentBasedRecos: function(docNum, resultType) {
@@ -329,18 +359,35 @@ RecommendationHandler.prototype = {
         };
 
         $.ajax(settings).done(function(data, textStatus, xhr) {
-            console.log('received ' + xhr.status);
-            var recType = xhr.getResponseHeader('X-Recommendation-Type');
-            var results = [];
-            if (xhr.status == 200 && data) {
-                data.forEach(function(element) {
-                    results.push(instance.buildRMeta(element, recType));
-                });
-            }
-            instance.update(results);
-            instance.refresh();
-        }).fail(function(data, textStatus, xhr) {
-            console.log("Error in retrieving content based recommendations: ", JSON.stringify(data));
+            console.log('(GET content reco) status: ' + xhr.status);
+            instance.manageSuccess(data, xhr);
+        }).fail(function(xhr, textStatus, errorThrown) {
+            instance.manangeFailure(xhr);
+        });
+    },
+
+    getCFRecos: function(docNum, resultType) {
+        var instance = this;
+        resultType = resultType || "RANDOM_10";
+
+        // stub for calling out content based recommender
+        var settings = {
+            async: true,
+            crossDomain: true,
+            url: "{0}/recommend/cf/document/{1}".format(Config.BASE_URL, docNum),
+            method: "GET",
+            processData: true,
+            data: {
+                "resultType": resultType,
+            },
+        };
+
+        $.ajax(settings)
+        .done(function(data, textStatus, xhr) {
+            console.log('(GET cf reco) status: ' + xhr.status);
+            instance.manageSuccess(data, xhr);
+        }).fail(function(xhr, textStatus, errorThrown) {
+            instance.manangeFailure(xhr);
         });
     },
 
