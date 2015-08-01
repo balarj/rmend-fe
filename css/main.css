@@ -1,145 +1,145 @@
 body {
-	margin: 0px;
-	padding: 30px;
+    margin: 0px;
+    padding: 30px;
 }
 
 body * {
-	font-family: sans-serif;
-	font-weight: 100;
+    font-family: sans-serif;
+    font-weight: 100;
 }
 
 h1, h2 {
-	color:#222;
+    color:#222;
 }
 
 h2, h3, h4 {
-	margin: 20px 0px 0px 0px;
+    margin: 20px 0px 0px 0px;
 }
 
 hr {
-	display: block; 
-	height: 1px;
-    border: 0; 
-    border-top: 1px solid #ccc;  
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #ccc;
 }
 
 ul {
-	list-style: none;
-	padding-left: 0px;
+    list-style: none;
+    padding-left: 0px;
 }
 
 ul li {
-	display: inline-block;
-	margin-right: 20px;
+    display: inline-block;
+    margin-right: 20px;
 }
 
 a {
-	font-size: 12pt;
-	color: #0088FF;
-	font-weight: 100;
-	text-decoration: none;
+    font-size: 12pt;
+    color: #0088FF;
+    font-weight: 100;
+    text-decoration: none;
 }
 
 a:hover, a:active, a:focus, .doc:hover {
-	color: #4E83A9;
-	/*font-weight: 400;*/
+    color: #4E83A9;
+    /*font-weight: 400;*/
 }
 
 p {
-	height: 20px;
+    height: 20px;
 }
 
 .docMeta {
-	display: none;
+    display: none;
 }
 
 .container {
-	/*width: 90%;*/
-	/*margin: 0px auto 0px auto;*/
+    /*width: 90%;*/
+    /*margin: 0px auto 0px auto;*/
 }
 
 #docs-by-topic .topic {
-	display: inline-block;
+    display: inline-block;
 }
 
 #docs-recommended .content-based, #docs-recommended .collaborative-filtering {
-	display: inline-block;
+    display: inline-block;
 }
 
 #docs-by-topic.container, #docs-recommended.container {
-	margin-top: 20px;
-	min-height: 100px;
-	position: relative;
+    margin-top: 20px;
+    min-height: 100px;
+    position: relative;
 }
 
 .lightbox {
-	display: none;
+    display: none;
 }
 
 .toast-warning {
-	font-size: 8pt;
+    font-size: 8pt;
     top: 10px;
     margin-left: -150px;
 }
 
 .doc {
-	display: inline-block;
-	width: 150px;
-	height: 150px;
-  	background-color: #F2F2F2;
-  	border: 1px solid #DDD;
-  	text-align: center;
-  	/*
-  	vertical-align: middle;
-  	line-height: 60px;*/
-  	margin: 0px 10px 10px 0px;
+    display: inline-block;
+    width: 150px;
+    height: 150px;
+    background-color: #F2F2F2;
+    border: 1px solid #DDD;
+    text-align: center;
+    /*
+    vertical-align: middle;
+    line-height: 60px;*/
+    margin: 0px 10px 10px 0px;
 }
 
 .doc:hover {
-	border: 1px solid #BBB;
-	background-color: #FCFCFC;
+    border: 1px solid #BBB;
+    background-color: #FCFCFC;
 }
 
 .doc span {
-	display: block;
-	padding: 10px 0px 10px 0px;
+    display: block;
+    padding: 10px 0px 10px 0px;
 
 }
 
 .doc span.title {
-	border-bottom: 1px solid #DDD;
+    border-bottom: 1px solid #DDD;
 }
 
 .doc span.description {
-	color: #777;
-	width: inherit;
-	overflow: hidden;
-  	text-overflow: ellipsis;
-	font-size: 10pt;
-	height: 80px;
-	overflow:none;
-	text-align: center;
+    color: #777;
+    width: inherit;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 10pt;
+    height: 80px;
+    overflow:none;
+    text-align: center;
 }
 
 .margin-top {
-	margin-top: 20px;
+    margin-top: 20px;
 }
 
 .content-beans-container {
-	float: right;
-	height: 50px;
+    float: right;
+    height: 50px;
 
 }
 
 .box {
-	display: inline-block;
-	width: auto;
-	height: 30px;
-	background-color: #F2F2F2;
-  	border-radius: 25px;
-  	text-align: center;
-  	vertical-align: middle;
-  	line-height: 30px;
-  	margin-left: 10px;
-  	padding: 0px 10px 0px 10px;
+    display: inline-block;
+    width: auto;
+    height: 30px;
+    background-color: #F2F2F2;
+    border-radius: 25px;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 30px;
+    margin-left: 10px;
+    padding: 0px 20px 0px 20px;
 }

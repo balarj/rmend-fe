@@ -65,7 +65,7 @@ App.prototype = {
                 console.log(topic + " - clicked");
                 instance.currentTopic = topic;
                 instance.getDocumentsByTopic(topic);
-                
+
                 $("#docs-by-topic").empty().spin('small');
             }
         });
@@ -78,12 +78,12 @@ App.prototype = {
             var doc = instance.getDocumentAtIndexForTopic(index);
             if (doc) {
 
-            	var lightBoxHTML = '<h2>' + doc.title + '</h2><div class="margin-top">' + doc.docBody.replace(/(?:\r\n|\r|\n|\n\n)/g, '<br />') + '</div>';
-                
+                var lightBoxHTML = '<h2>' + doc.title + '</h2><div class="margin-top">' + doc.docBody.replace(/(?:\r\n|\r|\n|\n\n)/g, '<br />') + '</div>';
+
                 if(doc.contentBeans.length > 0) {
-                	lightBoxHTML += instance.getContentTagsHTML(doc.contentBeans);	
+                    lightBoxHTML += instance.getContentTagsHTML(doc.contentBeans);
                 }
-                
+
                 $("#mylightbox").html(lightBoxHTML);
 
                 // user impression
@@ -93,7 +93,7 @@ App.prototype = {
             }
             // Generate recommendations
             if (instance.uid) {
-            	$("#docs-recommended").empty().spin('small');
+                $("#docs-recommended").empty().spin('small');
                 instance.getRecommendations(instance.uid, doc.docNum);
             }
 
@@ -101,8 +101,8 @@ App.prototype = {
 
         // document refresh handler
         $("#refresh-documents").on("click", function(e) {
-        	e.preventDefault();
-        	$("#docs-by-topic").empty().spin('small');
+            e.preventDefault();
+            $("#docs-by-topic").empty().spin('small');
             instance.getDocumentsByTopic(instance.currentTopic);
         });
 
@@ -115,11 +115,11 @@ App.prototype = {
             if (rMetaInstance) {
                 var doc = rMetaInstance.recDocument;
                 var lightBoxHTML = '<h2>' + doc.title + '</h2><div class="margin-top">' + doc.docBody.replace(/(?:\r\n|\r|\n|\n\n)/g, '<br />') + '</div>';
-               	
-               	if(doc.contentBeans.length > 0) {
-                	lightBoxHTML += instance.getContentTagsHTML(doc.contentBeans);	
+
+                if(doc.contentBeans.length > 0) {
+                    lightBoxHTML += instance.getContentTagsHTML(doc.contentBeans);
                 }
-                
+
                 $("#mylightbox").html(lightBoxHTML);
 
                 // capture user impression
@@ -135,7 +135,7 @@ App.prototype = {
 
         });
     },
-    
+
     getUserDetails: function(uuid) {
         var instance = this;
         var settings = {
@@ -248,8 +248,8 @@ App.prototype = {
                 var recType = recommendedDoc.recType.toDash() || "unknown";
                 //console.log(doc);
 
- 				var description = doc.docBody.split("\n")[0];
-                
+                var description = doc.docBody.split("\n")[0];
+
                 var docHTML = '<a href=#><div class="'+ recType +'"><span class="docMeta">' + recommendedDoc.recType + ':' + doc.docNum + '</span>' +
                     '<div class="doc" data-featherlight="#mylightbox"><span class="title">' + doc.title.substring(0, 15) + '</span><span class="description">' + description.substring(0,150) +'</span></div></div></a>';
 
@@ -259,17 +259,17 @@ App.prototype = {
     },
 
     getContentTagsHTML:function(contentBeans) {
-    	var contentBeansHTML = "<div class='content-beans-container'>";            
-   		// TODO: map may be removed if string splitting is not necessary
-    	var contentBeans = contentBeans.map(function(string){
-    		var keyValueArray = string.split(":");
-    		var value = keyValueArray[1];
-    		contentBeansHTML += "<p class='box'>"+value+"</p>";
-    		return value;
-    	});
+        var contentBeansHTML = "<div class='content-beans-container'>";
+        // TODO: map may be removed if string splitting is not necessary
+        var contentBeans = contentBeans.map(function(string){
+            var keyValueArray = string.split(":");
+            var value = keyValueArray[1];
+            contentBeansHTML += "<p class='box'>"+value+"</p>";
+            return value;
+        });
 
-    	contentBeansHTML += "</div>";
-    	return contentBeansHTML;
+        contentBeansHTML += "</div>";
+        return contentBeansHTML;
 
     },
 
@@ -369,7 +369,7 @@ RecommendationHandler.prototype = {
         var interval = 100;
         if (!instance.myTimerId) {
             instance.myTimerId = setInterval(function() {
-                console.log('checking...');
+                //console.log('checking...');
                 if (instance.checkRecState()) {
                     instance.refresh();
                 }
