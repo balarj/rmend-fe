@@ -225,9 +225,9 @@ App.prototype = {
             var documents = topics[currentTopic];
             for (i in documents) {
                 doc = documents[i];
-                //console.log(doc);
+                var description = doc.docBody.split("\n")[0];
                 var docHTML = '<a href=#><div class="'+ recType +'"><span class="docMeta">' + recType + ':' + doc.docNum + '</span>' +
-                    '<div class="doc" data-featherlight="#mylightbox">' + doc.title.substring(0, 15) + '</div></div></a>';
+                    '<div class="doc" data-featherlight="#mylightbox"><span class="title">' + doc.title.substring(0, 15) + '</span><span class="description">' + description.substring(0,150) +'</span></div></a>';
                 $("#docs-by-topic").append(docHTML);
 
             }
@@ -247,8 +247,12 @@ App.prototype = {
                 doc = recommendedDoc.recDocument;
                 var recType = recommendedDoc.recType.toDash() || "unknown";
                 //console.log(doc);
+
+ 				var description = doc.docBody.split("\n")[0];
+                
                 var docHTML = '<a href=#><div class="'+ recType +'"><span class="docMeta">' + recommendedDoc.recType + ':' + doc.docNum + '</span>' +
-                    '<div class="doc" data-featherlight="#mylightbox">' + doc.title.substring(0, 15) + '</div></div></a>';
+                    '<div class="doc" data-featherlight="#mylightbox"><span class="title">' + doc.title.substring(0, 15) + '</span><span class="description">' + description.substring(0,150) +'</span></div></div></a>';
+
                 $("#docs-recommended").append(docHTML);
             }
         }
