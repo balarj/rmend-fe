@@ -227,7 +227,7 @@ App.prototype = {
                 doc = documents[i];
                 var description = doc.docBody.split("\n")[0];
                 var docHTML = '<a href=#><div class="'+ recType +'"><span class="docMeta">' + recType + ':' + doc.docNum + '</span>' +
-                    '<div class="doc" data-featherlight="#mylightbox"><span class="title">' + doc.title.substring(0, 15) + '</span><span class="description">' + description.substring(0,150) +'</span></div></a>';
+                    '<div class="doc" data-featherlight="#mylightbox"><span class="title">' + doc.title.substring(0, 15) + '</span><span class="description">' + description.substring(0,150) +'</span></div></div></a>';
                 $("#docs-by-topic").append(docHTML);
 
             }
