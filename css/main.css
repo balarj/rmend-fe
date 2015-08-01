@@ -49,13 +49,21 @@ p {
 	height: 20px;
 }
 
-#docMeta {
+.docMeta {
 	display: none;
 }
 
 .container {
 	/*width: 90%;*/
 	/*margin: 0px auto 0px auto;*/
+}
+
+#docs-by-topic .topic {
+	display: inline-block;
+}
+
+#docs-recommended .content-based, #docs-by-recommended .collaborative-filtering {
+	display: inline-block;
 }
 
 #docs-by-topic.container, #docs-recommended.container {
