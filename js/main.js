@@ -77,7 +77,7 @@ App.prototype = {
 
                 // user impression
                 if (instance.uid) {
-                    instance.sendUserImpression(instance.uid, doc.docNum, "TOPICS");
+                    instance.sendUserImpression(instance.uid, doc.docNum, "topics");
                 }
             }
             // Generate recommendations
@@ -199,7 +199,7 @@ App.prototype = {
     updateTopicDocumentsView: function(recType) {
         $("#docs-by-topic").empty();
 
-        recType = recType || "TOPIC";
+        recType = recType || "topic";
 
         var currentTopic = this.currentTopic;
         var topics = this.topics;
@@ -210,8 +210,8 @@ App.prototype = {
             for (i in documents) {
                 doc = documents[i];
                 //console.log(doc);
-                var docHTML = '<a href=#><span id="docMeta">' + recType + ':' + doc.docNum + '</span>' +
-                    '<div class="doc" data-featherlight="#mylightbox">' + doc.title.substring(0, 15) + '</div></a>';
+                var docHTML = '<a href=#><div class="'+ recType +'"><span class="docMeta">' + recType + ':' + doc.docNum + '</span>' +
+                    '<div class="doc" data-featherlight="#mylightbox">' + doc.title.substring(0, 15) + '</div></div></a>';
                 $("#docs-by-topic").append(docHTML);
 
             }
@@ -229,9 +229,10 @@ App.prototype = {
                 var recommendedDoc = recommendations[i];
                 //console.log(recommendedDoc);
                 doc = recommendedDoc.recDocument;
+                var recType = recommendedDoc.recType.toDash() || "unknown";
                 //console.log(doc);
-                var docHTML = '<a href=#><span id="docMeta">' + recommendedDoc.recType + ':' + doc.docNum + '</span>' +
-                    '<div class="doc" data-featherlight="#mylightbox">' + doc.title.substring(0, 15) + '</div></a>';
+                var docHTML = '<a href=#><div class="'+ recType +'"><span class="docMeta">' + recommendedDoc.recType + ':' + doc.docNum + '</span>' +
+                    '<div class="doc" data-featherlight="#mylightbox">' + doc.title.substring(0, 15) + '</div></div></a>';
                 $("#docs-recommended").append(docHTML);
             }
         }
@@ -432,6 +433,13 @@ String.prototype.format = function() {
     return this.replace(/(\{\d+\})/g, function(a) {
         return args[+(a.substr(1, a.length - 2)) || 0];
     });
+};
+
+/**
+ *  Credits : http://jamesroberts.name/blog/2010/02/22/string-functions-for-javascript-trim-to-camel-case-to-dashed-and-to-underscore/
+ */
+String.prototype.toDash = function(){
+    return this.replace(/([A-Z])/g, function($1){return "-"+$1.toLowerCase();}).substr(1);
 };
 
 // ------------------------------------------
