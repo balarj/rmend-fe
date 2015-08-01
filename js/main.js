@@ -1,5 +1,4 @@
 /*
-
 TODOs:
     1. If there is not UUID provided.. show no content at all,  or show static content (like a preview)
     2. Disable clicking "Some Document placeholder"
@@ -61,6 +60,8 @@ App.prototype = {
                 console.log(topic + " - clicked");
                 instance.currentTopic = topic;
                 instance.getDocumentsByTopic(topic);
+                
+                $("#docs-by-topic").empty().spin('small');
             }
         });
 
@@ -79,9 +80,9 @@ App.prototype = {
                     instance.sendUserImpression(instance.uid, doc.docNum, "TOPICS");
                 }
             }
-
             // Generate recommendations
             if (instance.uid) {
+            	$("#docs-recommended").empty().spin('small');
                 instance.getRecommendations(instance.uid, doc.docNum);
             }
 
@@ -89,6 +90,8 @@ App.prototype = {
 
         // document refresh handler
         $("#refresh-documents").on("click", function(e) {
+        	e.preventDefault();
+        	$("#docs-by-topic").empty().spin('small');
             instance.getDocumentsByTopic(instance.currentTopic);
         });
 
@@ -116,7 +119,7 @@ App.prototype = {
 
         });
     },
-
+    
     getUserDetails: function(uuid) {
         var instance = this;
         var settings = {

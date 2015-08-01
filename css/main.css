@@ -60,6 +60,8 @@ p {
 
 #docs-by-topic.container, #docs-recommended.container {
 	margin-top: 20px;
+	min-height: 100px;
+	position: relative;
 }
 
 .lightbox {
