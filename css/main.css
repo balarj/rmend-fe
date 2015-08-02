@@ -161,6 +161,14 @@ body > .container {
     line-height: 150%;
 }
 
+.content-based .highlight {
+	background-color: #FF0;
+}
+
+.collaborative-filtering .highlight {
+	background-color: #0F0;
+}
+
 .margin-top {
     margin-top: 20px;
 }

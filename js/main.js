@@ -501,6 +501,17 @@ RecommendationHandler.prototype = {
         return retVal;
     },
 
+    toggleRecoColors:function() {
+    	
+    	var recommendedDocsDivs = $("#docs-recommended a .doc");
+
+    	if(recommendedDocsDivs.hasClass("highlight")) {
+    		recommendedDocsDivs.removeClass("highlight");
+    	} else {
+    		recommendedDocsDivs.addClass("highlight");
+    	}
+	},
+
     /**
      * Source: http://bost.ocks.org/mike/shuffle/
      */
