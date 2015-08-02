@@ -100,8 +100,8 @@ App.prototype = {
             }
             // Generate recommendations
             if (instance.uid) {
-            	$("#recommended-docs-header").show();
-            	$("#docs-recommended").show();	
+                $("#recommended-docs-header").show();
+                $("#docs-recommended").show();
                 $("#docs-recommended").empty().spin('small');
                 instance.getRecommendations(instance.uid, doc.docNum);
             }
@@ -144,8 +144,8 @@ App.prototype = {
 
         });
 
-		$("#refresh-documents").hide();
-		$("#docs-recommended").hide();	
+        $("#refresh-documents").hide();
+        $("#docs-recommended").hide();
 
     },
 
@@ -227,7 +227,7 @@ App.prototype = {
 
     updateTopicDocumentsView: function(recType) {
 
-    	$("#refresh-documents").show();
+        $("#refresh-documents").show();
 
         $("#docs-by-topic").empty();
 
@@ -250,7 +250,7 @@ App.prototype = {
     },
 
     updateRecommendedDocumentsView: function(recommendations) {
-        
+
         // clear out the container
         $("#docs-recommended").empty();
         //console.log(recommendations);
