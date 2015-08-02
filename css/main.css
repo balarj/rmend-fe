@@ -1,6 +1,6 @@
 body {
     margin: 0px;
-    padding: 30px;
+    padding-top: 30px;
 }
 
 body * {
@@ -198,6 +198,15 @@ body > .container {
 #welcome-greeting {
 	float: right;
 	margin-top: 15px;
+}
+
+#toggle-colors {
+	position: fixed;
+	bottom: 0px;
+	width: 50px;
+	height: 50px;
+	/*background: #EFEFEF;*/
+
 }
 
 

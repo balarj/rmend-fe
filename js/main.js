@@ -144,8 +144,13 @@ App.prototype = {
 
         });
 
-        $("#refresh-documents").hide();
-        $("#docs-recommended").hide();
+		$("#toggle-colors").on("click",function(e){
+			e.preventDefault();
+			instance.recommendationHandler.toggleRecoColors();
+		});
+
+        // $("#refresh-documents").hide();
+        // $("#docs-recommended").hide();
 
     },
 
