@@ -59,6 +59,11 @@ App.prototype = {
         // topic click handler
         $(".topic").on("click", function(e) {
             e.preventDefault();
+
+            $("#topics a.active").removeClass("active");
+            $(this).addClass("active");
+
+
             var topic = $(this).attr('topic');
             if (topic) {
                 $("#docs-recommended").empty();
@@ -68,6 +73,8 @@ App.prototype = {
 
                 $("#docs-by-topic").empty().spin('small');
             }
+
+            return false;
         });
 
         // document (under topic) click handler
@@ -93,6 +100,8 @@ App.prototype = {
             }
             // Generate recommendations
             if (instance.uid) {
+            	$("#recommended-docs-header").show();
+            	$("#docs-recommended").show();	
                 $("#docs-recommended").empty().spin('small');
                 instance.getRecommendations(instance.uid, doc.docNum);
             }
@@ -134,6 +143,10 @@ App.prototype = {
             }
 
         });
+
+		$("#refresh-documents").hide();
+		$("#docs-recommended").hide();	
+
     },
 
     getUserDetails: function(uuid) {
@@ -213,9 +226,12 @@ App.prototype = {
     },
 
     updateTopicDocumentsView: function(recType) {
+
+    	$("#refresh-documents").show();
+
         $("#docs-by-topic").empty();
 
-        recType = recType || "topic";
+        recType = recType || "topic-based";
 
         var currentTopic = this.currentTopic;
         var topics = this.topics;
@@ -225,9 +241,8 @@ App.prototype = {
             var documents = topics[currentTopic];
             for (i in documents) {
                 doc = documents[i];
-                var description = doc.docBody.split("\n")[0];
                 var docHTML = '<a href=#><div class="'+ recType +'"><span class="docMeta">' + recType + ':' + doc.docNum + '</span>' +
-                    '<div class="doc" data-featherlight="#mylightbox"><span class="title">' + doc.title.substring(0, 15) + '</span><span class="description">' + description.substring(0,150) +'</span></div></div></a>';
+                    '<div class="doc" data-featherlight="#mylightbox"><span class="title">' + doc.title + '</span><span class="description">' + doc.abstract +'</span></div></div></a>';
                 $("#docs-by-topic").append(docHTML);
 
             }
@@ -235,6 +250,7 @@ App.prototype = {
     },
 
     updateRecommendedDocumentsView: function(recommendations) {
+        
         // clear out the container
         $("#docs-recommended").empty();
         //console.log(recommendations);
@@ -248,10 +264,8 @@ App.prototype = {
                 var recType = recommendedDoc.recType.toDash() || "unknown";
                 //console.log(doc);
 
-                var description = doc.docBody.split("\n")[0];
-
                 var docHTML = '<a href=#><div class="'+ recType +'"><span class="docMeta">' + recommendedDoc.recType + ':' + doc.docNum + '</span>' +
-                    '<div class="doc" data-featherlight="#mylightbox"><span class="title">' + doc.title.substring(0, 15) + '</span><span class="description">' + description.substring(0,150) +'</span></div></div></a>';
+                    '<div class="doc" data-featherlight="#mylightbox"><span class="title">' + doc.title + '</span><span class="description">' + doc.abstract +'</span></div></div></a>';
 
                 $("#docs-recommended").append(docHTML);
             }

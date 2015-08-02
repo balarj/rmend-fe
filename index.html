@@ -10,38 +10,34 @@
 
 	<body>
 		<div class='container'>
-			<h1>Rmend</h1>
-
-			<p id="welcome-greeting"></p>
-
-			<h2>Docs by Topics</h2>
+			<div class="header">
+				<h1 id="title">Rmend</h1>
+				<span id="welcome-greeting"></span>
+			</div>
 			<hr/>
 
-			<h4>Choose a topic</h4>
-
-			<ul>
-				<li><a href="#" class="topic" topic="sports">Sports</a></li>
-				<li><a href="#" class="topic" topic="technology_internet">Tech</a></li>
-				<li><a href="#" class="topic" topic="topic3">Topic 3</a></li>
-				<li><a href="#" class="topic" topic="topic4">Topic 4</a></li>
+			<ul id="topics" class="margin-top">
+				<li><a href="#" class="box topic" topic="sports">Sports</a></li>
+				<li><a href="#" class="topic box" topic="technology_internet">Tech</a></li>
+				<li><a href="#" class="topic box" topic="topic3">Topic 3</a></li>
+				<li><a href="#" class="topic box" topic="topic4">Topic 4</a></li>
 			</ul>	
 
-			<h4>Documents</h4>
-			<span id="refresh-documents"><a href="#">refresh</a></span>
-
-			<div id="docs-by-topic" class="container">
-				<a href=#><div class="doc" data-featherlight="#mylightbox">Some doc</div></a>				
-			</div>
-
+			<ul>
+				<li><span id="refresh-documents"><a href="#">[ Refresh ]</a></span></li>
+			</ul>
 			
-			<h2>Recommended Docs</h2>
-			<hr/>
 
-			<div id="docs-recommended" class="container">
-				<!-- <a href=#><div class="doc" data-featherlight="#mylightbox">Some doc</div></a> -->
+			<div id="docs-by-topic" class="container"></div>
+
+			<div id="recommended-docs-header">
+				<h2>Recommended for you..</h2>
+				<hr/>
 			</div>
+
+			<div id="docs-recommended" class="container"></div>
  
-		
+	
 			<div id="mylightbox" class="lightbox">This div will be opened in a lightbox</div>
  
 			<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>

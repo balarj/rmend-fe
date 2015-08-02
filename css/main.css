@@ -8,12 +8,20 @@ body * {
     font-weight: 100;
 }
 
+h1 {
+	margin-bottom: 0px;
+}
+
 h1, h2 {
-    color:#222;
+    color:#222;    
 }
 
 h2, h3, h4 {
     margin: 20px 0px 0px 0px;
+}
+
+h4 {
+	font-weight: 400;
 }
 
 hr {
@@ -30,7 +38,7 @@ ul {
 
 ul li {
     display: inline-block;
-    margin-right: 20px;
+    /*margin-right: 20px;*/
 }
 
 a {
@@ -41,7 +49,7 @@ a {
 }
 
 a:hover, a:active, a:focus, .doc:hover {
-    color: #4E83A9;
+    /*color: #4E83A9;*/
     /*font-weight: 400;*/
 }
 
@@ -49,26 +57,54 @@ p {
     height: 20px;
 }
 
+.box {
+    display: inline-block;
+    width: auto;
+    height: 30px;
+    background-color: #F2F2F2;
+    border-radius: 25px;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 30px;
+    margin-left: 10px;
+    padding: 0px 20px 0px 20px;
+}
+
 .docMeta {
     display: none;
 }
 
-.container {
-    /*width: 90%;*/
-    /*margin: 0px auto 0px auto;*/
+body > .container {
+    width: 960px;
+    margin: 0px auto 0px auto;
 }
 
-#docs-by-topic .topic {
+.topic {
+    background-color: #FDFDFD;
+    margin-left: 0px;
+    margin-right: 10px;
+    color:#888;
+    border: 1px solid #F5F3F3;
+}
+
+.active, .topic:hover, topic:active, topic:focus {
+    background-color: #0088FF;
+    color:#FFF;
+    border: 1px solid #0088FF;
+
+}
+
+#docs-by-topic .topic-based,  #docs-recommended .content-based, #docs-recommended .collaborative-filtering {
     display: inline-block;
 }
 
-#docs-recommended .content-based, #docs-recommended .collaborative-filtering {
-    display: inline-block;
+#recommended-docs-header {
+	display: none;
 }
 
 #docs-by-topic.container, #docs-recommended.container {
     margin-top: 20px;
-    min-height: 100px;
+    min-height: 200px;
     position: relative;
 }
 
@@ -84,15 +120,16 @@ p {
 
 .doc {
     display: inline-block;
-    width: 150px;
-    height: 150px;
-    background-color: #F2F2F2;
-    border: 1px solid #DDD;
+    width: 165px;
+    height: 180px;
+    padding: 5px;
+    background-color: #FDFDFD; /*#F2F2F2*/
+    border: 1px solid #F5F3F3;
     text-align: center;
     /*
     vertical-align: middle;
     line-height: 60px;*/
-    margin: 0px 10px 10px 0px;
+    margin: 0px 14px 14px 0px;
 }
 
 .doc:hover {
@@ -107,7 +144,9 @@ p {
 }
 
 .doc span.title {
-    border-bottom: 1px solid #DDD;
+	border-bottom: 1px solid #DDD;
+	height:40px;
+	overflow: hidden;
 }
 
 .doc span.description {
@@ -116,9 +155,10 @@ p {
     overflow: hidden;
     text-overflow: ellipsis;
     font-size: 10pt;
-    height: 80px;
+    height: 110px;
     overflow:none;
     text-align: center;
+    line-height: 150%;
 }
 
 .margin-top {
@@ -131,15 +171,25 @@ p {
 
 }
 
-.box {
-    display: inline-block;
-    width: auto;
-    height: 30px;
-    background-color: #F2F2F2;
-    border-radius: 25px;
-    text-align: center;
-    vertical-align: middle;
-    line-height: 30px;
-    margin-left: 10px;
-    padding: 0px 20px 0px 20px;
+#refresh-documents,  #recommended-docs-header {
+	display: none;
 }
+
+#topics {
+	width: inherit;
+	text-align: center;
+	margin-left:auto;
+	margin-right:auto;
+}
+
+#title, #welcome-greeting {
+	display: inline-block;
+	margin-top: 0px;
+}
+
+#welcome-greeting {
+	float: right;
+	margin-top: 15px;
+}
+
+
