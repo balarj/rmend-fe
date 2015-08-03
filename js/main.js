@@ -85,7 +85,8 @@ App.prototype = {
             var doc = instance.getDocumentAtIndexForTopic(index);
             if (doc) {
 
-                var lightBoxHTML = '<h2>' + doc.title + '</h2><div class="margin-top">' + doc.docBody.replace(/(?:\r\n|\r|\n|\n\n)/g, '<br />') + '</div>';
+                var lightBoxHTML = '<div class="contentDoc"><span class="title">' + doc.title + '</span>' +
+                    '<div class="docBody">' + doc.docBody.replace(/(?:\r\n|\r|\n|\n\n)/g, '<br />') + '</div></div>';
 
                 if(doc.contentBeans.length > 0) {
                     lightBoxHTML += instance.getContentTagsHTML(doc.contentBeans);
@@ -123,7 +124,8 @@ App.prototype = {
             var rMetaInstance = instance.recommendationHandler.getDocumentAtIndex(index);
             if (rMetaInstance) {
                 var doc = rMetaInstance.recDocument;
-                var lightBoxHTML = '<h2>' + doc.title + '</h2><div class="margin-top">' + doc.docBody.replace(/(?:\r\n|\r|\n|\n\n)/g, '<br />') + '</div>';
+                var lightBoxHTML = '<div class="contentDoc"><span class="title">' + doc.title + '</span>' +
+                    '<div class="docBody">' + doc.docBody.replace(/(?:\r\n|\r|\n|\n\n)/g, '<br />') + '</div></div>';
 
                 if(doc.contentBeans.length > 0) {
                     lightBoxHTML += instance.getContentTagsHTML(doc.contentBeans);
@@ -283,7 +285,7 @@ App.prototype = {
         var contentBeans = contentBeans.map(function(string){
             var keyValueArray = string.split(":");
             var value = keyValueArray[1];
-            contentBeansHTML += "<p class='box'>"+value+"</p>";
+            contentBeansHTML += "<p class='metaBox'>"+value+"</p>";
             return value;
         });
 
