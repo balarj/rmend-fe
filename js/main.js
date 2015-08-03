@@ -45,7 +45,7 @@ App.prototype = {
         var instance = this;
 
         // lightbox default behavior
-        $.featherlight.defaults.afterClose = function() {
+        /*$.featherlight.defaults.afterClose = function() {
             var errorMsg = instance.recommendationHandler.getErrors();
             if (errorMsg) {
                 toastr.warning(errorMsg, {
@@ -54,7 +54,7 @@ App.prototype = {
                 });
             }
             instance.recommendationHandler.resetErrors();
-        };
+        };*/
 
         // topic click handler
         $(".topic").on("click", function(e) {
@@ -247,7 +247,7 @@ App.prototype = {
             for (i in documents) {
                 doc = documents[i];
                 var docHTML = '<a href=#><div class="'+ recType +'"><span class="docMeta">' + recType + ':' + doc.docNum + '</span>' +
-                    '<div class="doc" data-featherlight="#mylightbox"><span class="title">' + doc.title + '</span><span class="description">' + doc.abstract +'</span></div></div></a>';
+                    '<div class="doc" data-featherlight="#mylightbox"><span class="title">' + doc.abstractTitle + '</span><span class="description">' + doc.abstract +'</span></div></div></a>';
                 $("#docs-by-topic").append(docHTML);
 
             }
@@ -270,7 +270,7 @@ App.prototype = {
                 //console.log(doc);
 
                 var docHTML = '<a href=#><div class="'+ recType +'"><span class="docMeta">' + recommendedDoc.recType + ':' + doc.docNum + '</span>' +
-                    '<div class="doc" data-featherlight="#mylightbox"><span class="title">' + doc.title + '</span><span class="description">' + doc.abstract +'</span></div></div></a>';
+                    '<div class="doc" data-featherlight="#mylightbox"><span class="title">' + doc.abstractTitle + '</span><span class="description">' + doc.abstract +'</span></div></div></a>';
 
                 $("#docs-recommended").append(docHTML);
             }
@@ -319,6 +319,7 @@ App.prototype = {
 
     getRecommendations: function(uid, docNum) {
         var instance = this;
+        instance.recommendationHandler.recommendations = [];
 
         // stub for calling out both content-based and collaborative filtering methods.
         instance.recommendationHandler.getContentBasedRecos(docNum);
@@ -403,8 +404,25 @@ RecommendationHandler.prototype = {
     },
 
     refresh: function() {
+        this.removeDupes();
         this.parent.updateRecommendedDocumentsView(this.shuffle(this.recommendations).slice(0, 10));
         this.resetRecState();
+    },
+
+    removeDupes: function() {
+        var uniqueRecommendations = {};
+        for (rec in this.recommendations) {
+            var recDoc = this.recommendations[rec];
+            var recDocument = recDoc['recDocument'];
+            if (recDocument[rec.docId] == undefined ) {
+                uniqueRecommendations[recDocument.docId] = recDoc;
+            }
+        }
+        var recArray = [];
+        for (rec in uniqueRecommendations) {
+            recArray.push(uniqueRecommendations[rec]);
+        }
+        this.recommendations = recArray;
     },
 
     getDocumentAtIndex: function(index) {
@@ -507,7 +525,7 @@ RecommendationHandler.prototype = {
     },
 
     toggleRecoColors:function() {
-    	
+
     	var recommendedDocsDivs = $("#docs-recommended a .doc");
 
     	if(recommendedDocsDivs.hasClass("highlight")) {
@@ -539,6 +557,7 @@ RecommendationHandler.prototype = {
         return array;
     }
 };
+
 /**
  *  Credits : http://stackoverflow.com/questions/25227119/javascript-strings-format-is-not-defined
  */
