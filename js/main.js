@@ -113,6 +113,7 @@ App.prototype = {
         $("#refresh-documents").on("click", function(e) {
             e.preventDefault();
             $("#docs-by-topic").empty().spin('small');
+            $("#docs-recommended").empty().spin('small');
             instance.getDocumentsByTopic(instance.currentTopic);
         });
 
@@ -237,6 +238,7 @@ App.prototype = {
         $("#refresh-documents").show();
 
         $("#docs-by-topic").empty();
+        $("#docs-recommended").empty();
 
         recType = recType || "topic-based";
 
