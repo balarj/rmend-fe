@@ -13,7 +13,7 @@ h1 {
 }
 
 h1, h2 {
-    color:#222;    
+    color:#222;
 }
 
 h2, h3, h4 {
@@ -84,7 +84,7 @@ body > .container {
     margin-left: 0px;
     margin-right: 10px;
     color:#888;
-    border: 1px solid #F5F3F3;
+    border: 1px solid #E0E0E0; /*#F5F3F3*/
 }
 
 .active, .topic:hover, topic:active, topic:focus {
@@ -121,10 +121,10 @@ body > .container {
 .doc {
     display: inline-block;
     width: 165px;
-    height: 180px;
+    height: 190px;
     padding: 5px;
     background-color: #FDFDFD; /*#F2F2F2*/
-    border: 1px solid #F5F3F3;
+    border: 1px solid #E0E0E0; /*#F5F3F3*/
     text-align: center;
     /*
     vertical-align: middle;
@@ -162,11 +162,11 @@ body > .container {
 }
 
 .content-based .highlight {
-	background-color: #FF0;
+	background-color: #F0FFE4; /*#FF0*/
 }
 
 .collaborative-filtering .highlight {
-	background-color: #0F0;
+	background-color: #FFFBDB; /*#0F0*/
 }
 
 .margin-top {
