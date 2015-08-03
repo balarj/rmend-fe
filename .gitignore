@@ -1,0 +1,9 @@
+.idea/
+.DS_Store
+.gitconfig
+target/
+*.iml
+web/
+datanucleus.log
+patch/
+conf/
