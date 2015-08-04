@@ -33,7 +33,7 @@ var RecommendationHandler = function(parent) {
     this.errorMsg = null;
     this.parent = parent;
     this.recState = {};
-    this.myTimerId;
+    this.myTimerId = null;
 
     this.currentWaitMs = 0;
     this.maxWaitTimeMs = 100*50; // Max wait
@@ -136,7 +136,7 @@ App.prototype = {
 
                 // capture user impression
                 if (instance.uid && doc) {
-                    instance.sendUserImpression(instance.uid, doc.docNum, rMetaInstance.recType);
+                    instance.sendUserImpression(instance.uid, doc.docNum, rMetaInstance.recType, rMetaInstance.parentDocument);
                 }
             }
 
@@ -147,10 +147,10 @@ App.prototype = {
 
         });
 
-		$("#toggle-colors").on("click",function(e){
-			e.preventDefault();
-			instance.recommendationHandler.toggleRecoColors();
-		});
+        $("#toggle-colors").on("click",function(e){
+            e.preventDefault();
+            instance.recommendationHandler.toggleRecoColors();
+        });
 
         // $("#refresh-documents").hide();
         // $("#docs-recommended").hide();
@@ -296,7 +296,7 @@ App.prototype = {
 
     },
 
-    sendUserImpression: function(uid, docNum, referrer) {
+    sendUserImpression: function(uid, docNum, referrer, parentDoc) {
         var settings = {
             async: true,
             crossDomain: true,
@@ -308,7 +308,8 @@ App.prototype = {
             processData: true,
             data: JSON.stringify({
                 "uid": uid,
-                "docNum": docNum
+                "docNum": docNum,
+                "parentDoc": parentDoc,
             }),
         };
 
@@ -450,13 +451,13 @@ RecommendationHandler.prototype = {
         instance.markRecState(type, true);
     },
 
-    manageSuccess: function(data, xhr, type) {
+    manageSuccess: function(data, xhr, type, parentDoc) {
         var instance = this;
         var recType = xhr.getResponseHeader('X-Recommendation-Type');
         var results = [];
         if (xhr.status == 200 && data) {
             data.forEach(function(element) {
-                results.push(instance.buildRMeta(element, recType));
+                results.push(instance.buildRMeta(element, recType, parentDoc));
             });
         }
         instance.update(results);
@@ -484,7 +485,7 @@ RecommendationHandler.prototype = {
 
         $.ajax(settings).done(function(data, textStatus, xhr) {
             console.log('(GET content reco) status: ' + xhr.status);
-            instance.manageSuccess(data, xhr, type);
+            instance.manageSuccess(data, xhr, type, docNum);
         }).fail(function(xhr, textStatus, errorThrown) {
             instance.manangeFailure(xhr, type);
         });
@@ -513,17 +514,18 @@ RecommendationHandler.prototype = {
         $.ajax(settings)
         .done(function(data, textStatus, xhr) {
             console.log('(GET cf reco) status: ' + xhr.status);
-            instance.manageSuccess(data, xhr, type);
+            instance.manageSuccess(data, xhr, type, docNum);
         }).fail(function(xhr, textStatus, errorThrown) {
             instance.manangeFailure(xhr, type);
         });
         instance.waitForResults();
     },
 
-    buildRMeta: function(recDoc, recType) {
+    buildRMeta: function(recDoc, recType, parentDoc) {
         var retVal = {
             'recDocument': recDoc,
             'recType': recType,
+            'parentDocument': parentDoc,
         };
         return retVal;
     },
